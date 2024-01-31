@@ -5,7 +5,7 @@ from nltk.stem import PorterStemmer
 from collections import defaultdict
 
 # Charger la liste de documents à partir du fichier JSON
-with open('crawled_urls_test.json', 'r', encoding='utf-8') as file:
+with open('crawled_urls.json', 'r', encoding='utf-8') as file:
     documents = json.load(file)
 
 # Initialiser l'index inversé vide
@@ -60,6 +60,16 @@ for i, document in enumerate(documents):
 # Calcul des statistiques finales
 average_tokens_per_document = num_tokens_global / num_documents
 
+# Enregistrement des statistiques dans un fichier JSON
+metadata = {
+    'num_documents': num_documents,
+    'num_tokens_global': num_tokens_global,
+    'average_tokens_per_document': average_tokens_per_document
+}
+
+with open('metadata.json', 'w', encoding='utf-8') as metadata_file:
+    json.dump(metadata, metadata_file, ensure_ascii=False, indent=2)
+
 # Enregistrement de l'index inversé dans un fichier JSON
 with open('index.json', 'w', encoding='utf-8') as index_file:
     # Utiliser json.dumps avec des séparateurs personnalisés pour obtenir le formatage souhaité
@@ -69,3 +79,5 @@ with open('index.json', 'w', encoding='utf-8') as index_file:
 # Enregistrement de l'index positionnel dans un fichier JSON
 with open('title.pos_index.json', 'w', encoding='utf-8') as pos_index_file:
     json.dump(pos_index, pos_index_file, ensure_ascii=False, indent=2)
+    
+print("FINI :)")
