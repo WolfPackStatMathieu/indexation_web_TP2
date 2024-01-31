@@ -22,6 +22,11 @@ num_documents = len(documents)
 num_tokens_global = 0
 average_tokens_per_document = 0
 
+num_tokens_url = 0
+num_tokens_title = 0
+num_tokens_content = 0
+num_tokens_h1 = 0
+
 # Parcourir chaque document dans la liste
 for i, document in enumerate(documents):
     # Extraire les informations nécessaires
@@ -46,6 +51,12 @@ for i, document in enumerate(documents):
     tokens_all = processed_tokens_url + processed_tokens_title + processed_tokens_content + processed_tokens_h1
     num_tokens_global += len(tokens_all)
     
+    # Mise à jour des statistiques par champ
+    num_tokens_url += len(tokens_url)
+    num_tokens_title += len(tokens_title)
+    num_tokens_content += len(tokens_content)
+    num_tokens_h1 += len(tokens_h1)
+    
     # Créer une liste inversée pour chaque token
     for token in set(tokens_all):
         if i not in index[token]:
@@ -59,12 +70,20 @@ for i, document in enumerate(documents):
 
 # Calcul des statistiques finales
 average_tokens_per_document = num_tokens_global / num_documents
+average_tokens_per_url = num_tokens_url / num_documents
+average_tokens_per_title = num_tokens_title / num_documents
+average_tokens_per_content = num_tokens_content / num_documents
+average_tokens_per_h1 = num_tokens_h1 / num_documents
 
 # Enregistrement des statistiques dans un fichier JSON
 metadata = {
     'num_documents': num_documents,
     'num_tokens_global': num_tokens_global,
-    'average_tokens_per_document': average_tokens_per_document
+    'average_tokens_per_document': average_tokens_per_document,
+    'average_tokens_per_url': average_tokens_per_url,
+    'average_tokens_per_title': average_tokens_per_title,
+    'average_tokens_per_content': average_tokens_per_content,
+    'average_tokens_per_h1': average_tokens_per_h1
 }
 
 with open('metadata.json', 'w', encoding='utf-8') as metadata_file:
@@ -80,4 +99,4 @@ with open('index.json', 'w', encoding='utf-8') as index_file:
 with open('title.pos_index.json', 'w', encoding='utf-8') as pos_index_file:
     json.dump(pos_index, pos_index_file, ensure_ascii=False, indent=2)
     
-print("FINI :)")
+print("FINI")
