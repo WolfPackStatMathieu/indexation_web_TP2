@@ -1,3 +1,4 @@
+# Importer les bibliothèques nécessaires
 import json
 from nltk.tokenize import word_tokenize
 from nltk.stem import PorterStemmer
@@ -7,8 +8,11 @@ from collections import defaultdict
 with open('crawled_urls_test.json', 'r', encoding='utf-8') as file:
     documents = json.load(file)
 
-# Initialiser l'index vide
+# Initialiser l'index inversé vide
 index = defaultdict(list)
+
+# Initialiser l'index positionnel vide
+pos_index = defaultdict(lambda: defaultdict(list))  # Index positionnel
 
 # Initialiser le stemmer de Porter
 porter_stemmer = PorterStemmer()
@@ -44,21 +48,24 @@ for i, document in enumerate(documents):
     
     # Créer une liste inversée pour chaque token
     for token in set(tokens_all):
-        index[token].append(i)
+        if i not in index[token]:
+            index[token].append(i)
+            
+    # Index positionnel sur les titres
+    
+    # Construction de l'index positionnel pour le champ title
+    for position, token in enumerate(processed_tokens_title):
+        pos_index[token][i].append(position)
 
 # Calcul des statistiques finales
 average_tokens_per_document = num_tokens_global / num_documents
 
-# Enregistrement de l'index dans un fichier JSON
+# Enregistrement de l'index inversé dans un fichier JSON
 with open('index.json', 'w', encoding='utf-8') as index_file:
-    json.dump(index, index_file, ensure_ascii=False, indent=2)
+    # Utiliser json.dumps avec des séparateurs personnalisés pour obtenir le formatage souhaité
+    output = json.dumps(index, ensure_ascii=False, indent=2, separators=(',', ': '))
+    index_file.write(output)
 
-# Enregistrement des statistiques dans un fichier JSON
-metadata = {
-    'num_documents': num_documents,
-    'num_tokens_global': num_tokens_global,
-    'average_tokens_per_document': average_tokens_per_document
-}
-
-with open('metadata.json', 'w', encoding='utf-8') as metadata_file:
-    json.dump(metadata, metadata_file, ensure_ascii=False, indent=2)
+# Enregistrement de l'index positionnel dans un fichier JSON
+with open('title.pos_index.json', 'w', encoding='utf-8') as pos_index_file:
+    json.dump(pos_index, pos_index_file, ensure_ascii=False, indent=2)
